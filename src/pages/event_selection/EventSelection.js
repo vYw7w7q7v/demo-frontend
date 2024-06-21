@@ -1,65 +1,40 @@
-import React, { useState } from 'react';
-import { Card, CardContent, Typography, Button, Box, CardMedia, Modal, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Card, CardContent, Typography, Button, Box, CardMedia, Modal, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, IconButton, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import DefaultEventImage from '@mui/material/Avatar';
 import './EventSelection.css';
-
-const events = [
-  {
-    id: 1,
-    title: "Рок-концерт",
-    imageUrl: "/img/event/event_1.jpg",
-    location: "пер. Домодедовская, 20",
-    time: "12/24/2024 19:00",
-    type: "концерт"
-  },
-  {
-    id: 2,
-    title: "Отцы и дети",
-    imageUrl: "/img/event/event_2.jpg",
-    location: "ул. Ленина, 60",
-    time: "12/25/2024 18:30",
-    type: "театр"
-  },
-  {
-    id: 3,
-    title: "Диджей из Сочи",
-    imageUrl: "/img/event/event_3.jpg",
-    location: "наб. Славы, 93",
-    time: "12/26/2024 20:15",
-    type: "другое"
-  },
-  {
-    id: 4,
-    title: "Вручение награды",
-    imageUrl: "/img/event/event_4.jpg",
-    location: "бульвар Чехова, 58",
-    time: "12/27/2024 17:45",
-    type: "другое"
-  },
-  {
-    id: 5,
-    title: "Модный показ",
-    imageUrl: "/img/event/event_5.jpg",
-    location: "спуск Косиора, 32",
-    time: "12/28/2024 16:20",
-    type: "другое"
-  },
-  {
-    id: 6,
-    title: "Евгений Онегин",
-    imageUrl: "/img/event/event_6.jpg",
-    location: "шоссе Будапештская, 97",
-    time: "12/29/2024 21:00",
-    type: "театр"
-  }
-];
-
+import {useApiContext} from "../../context/api/ApiContext";
 
 const EventSelection = () => {
+  const { apiUrl } = useApiContext();
   const [openEventDetails, setOpenEventDetails] = useState(false);
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(""); // добавляем состояние для хранения строки поиска
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterType, setFilterType] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/open-event/get`);
+        const eventsWithImages = response.data.map(event => ({
+          ...event,
+          image: `data:image/jpeg;base64,${event.image}`
+        }));
+        setEvents(eventsWithImages);
+      } catch (error) {
+        console.error('Ошибка при загрузке данных событий:', error);
+      }
+    };
+
+    fetchEvents();
+  }, [apiUrl]);
 
   const handleOpenEventDetails = (event) => {
     setSelectedEvent(event);
@@ -76,95 +51,194 @@ const EventSelection = () => {
     setOpenImageModal(false);
     setSelectedEvent(null);
     setSelectedImage(null);
+    setConfirmDialogOpen(false);
   };
 
-  const filteredEvents = events.filter(event =>
-    event.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleFilterOpen = () => {
+    setFilterOpen(true);
+  };
+
+  const handleFilterClose = () => {
+    setFilterOpen(false);
+  };
+
+  const handleFilterApply = () => {
+    setFilterOpen(false);
+  };
+
+  const handleConfirmDialogOpen = (event) => {
+    setSelectedEvent(event);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleConfirmDialogClose = () => {
+    setConfirmDialogOpen(false);
+  };
+
+  const handleEventConfirm = () => {
+    setEvents(events.filter(e => e.id !== selectedEvent.id));
+    handleConfirmDialogClose();
+  };
+
+  const filteredEvents = events.filter(event => {
+    const matchesSearchTerm = event.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType ? event.type === filterType : true;
+    const matchesDate = filterDate ? event.date.split('T')[0] === filterDate : true;
+    return matchesSearchTerm && matchesType && matchesDate;
+  });
 
   return (
-    <div>
-      <Card style={{ width: '89%', margin: '10px auto' }}>
-        <CardContent>
-          <TextField
-            label="Поиск"
-            variant="outlined"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ marginTop: '10px' }}
-          />
-        </CardContent>
-      </Card>
-      <div className="events-grid">
-        {filteredEvents.map(event => (
-          <Card key={event.id} className="event-card">
-            <CardContent>
-              <Box display="flex" flexDirection="column" alignItems="center">
-                <Typography gutterBottom variant="h6" component="div" className="text-content" style={{ fontFamily: 'Roboto', fontSize: '24px', fontWeight: 'bold' }}>
-                  {event.title}
-                </Typography>
-                <Box className="image-container" sx={{ marginBottom: '10px' }} onClick={() => handleOpenImageModal(event.imageUrl)}>
-                  <CardMedia
-                    component="img"
-                    image={event.imageUrl}
-                    alt={event.title}
-                    className="event-image"
-                  />
-                </Box>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  className="text-content"
-                  style={{ fontFamily: 'Roboto', fontSize: '16px', cursor: 'pointer', textDecoration: 'underline' }}
-                  onClick={() => handleOpenEventDetails(event)}>
-                  Место и время
-                </Typography>
-                <Button variant="contained" style={{ fontFamily: 'Roboto', marginTop: '10px', backgroundColor: '#FFA500', color: 'white' }}>Выбрать</Button>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <Dialog
-        open={openEventDetails}
-        onClose={handleClose}
-        aria-labelledby="event-details-title"
-        aria-describedby="event-details-description"
-      >
-        <DialogTitle id="event-details-title">{selectedEvent ? selectedEvent.title : ''}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="event-details-description">
-            {selectedEvent && (
-              <>
-                <Typography variant="body2" color="text.secondary">
-                  Место: {selectedEvent.location}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Время: {selectedEvent.time}
-                </Typography>
-              </>
+      <div>
+        <Card style={{ width: '89%', margin: '10px auto' }}>
+          <CardContent>
+            <Box display="flex" alignItems="center">
+              <TextField
+                  placeholder="Введите запрос для поиска..."
+                  variant="outlined"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ marginTop: '10px', flex: 1 }}
+              />
+              <IconButton onClick={handleFilterOpen} style={{ marginLeft: '10px', marginTop: '10px' }}>
+                <FilterListIcon />
+              </IconButton>
+            </Box>
+          </CardContent>
+        </Card>
+        <div className="events-grid">
+          {filteredEvents.map(event => (
+              <Card key={event.id} className="event-card">
+                <CardContent>
+                  <Box display="flex" flexDirection="column" alignItems="center">
+                    <Typography gutterBottom variant="h6" component="div" className="text-content" style={{ fontFamily: 'Roboto', fontSize: '24px', fontWeight: 'bold' }}>
+                      {event.name}
+                    </Typography>
+                    <Box className="image-container" sx={{ marginBottom: '10px' }} onClick={() => handleOpenImageModal(event.image)}>
+                      <CardMedia
+                          component="img"
+                          image={event.image}
+                          onError={() => setSelectedImage(DefaultEventImage)}
+                          alt={event.name}
+                          className="event-image"
+                      />
+                    </Box>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        className="text-content"
+                        style={{ fontFamily: 'Roboto', fontSize: '16px', cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => handleOpenEventDetails(event)}>
+                      Место и время
+                    </Typography>
+                    <Button variant="contained" style={{ fontFamily: 'Roboto', marginTop: '10px', backgroundColor: '#FFA500', color: 'white' }} onClick={() => handleConfirmDialogOpen(event)}>Выбрать</Button>
+                  </Box>
+                </CardContent>
+              </Card>
+          ))}
+        </div>
+        <Dialog
+            open={openEventDetails}
+            onClose={handleClose}
+            aria-labelledby="event-details-title"
+            aria-describedby="event-details-description"
+        >
+          <DialogTitle id="event-details-title">{selectedEvent ? selectedEvent.name : ''}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="event-details-description">
+              {selectedEvent && (
+                  <>
+                    <Typography variant="body2" color="text.secondary">
+                      Место: {selectedEvent.location}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Дата и время: {new Date(selectedEvent.date).toLocaleString()}
+                    </Typography>
+                  </>
+              )}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} autoFocus>
+              Закрыть
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Modal
+            open={openImageModal}
+            onClose={handleClose}
+            aria-labelledby="modal-title"
+            aria-describedby="modal-description"
+        >
+          <Box className="modal-content">
+            {selectedImage && (
+                <img src={selectedImage} alt="Event" className="modal-image" />
             )}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} autoFocus>
-            Закрыть
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Modal
-        open={openImageModal}
-        onClose={handleClose}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-      >
-        <Box className="modal-content">
-          {selectedImage && (
-            <img src={selectedImage} alt="Event" className="modal-image" />
-          )}
-        </Box>
-      </Modal>
-    </div>
+          </Box>
+        </Modal>
+        <Dialog
+            open={filterOpen}
+            onClose={handleFilterClose}
+            aria-labelledby="filter-dialog-title"
+            aria-describedby="filter-dialog-description"
+        >
+          <DialogTitle id="filter-dialog-title">Фильтры</DialogTitle>
+          <DialogContent>
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="filter-type-label">Тип события</InputLabel>
+              <Select
+                  labelId="filter-type-label"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+              >
+                <MenuItem value=""><em>Все</em></MenuItem>
+                <MenuItem value="концерт">Концерт</MenuItem>
+                <MenuItem value="театр">Театр</MenuItem>
+                <MenuItem value="другое">Другое</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+                label="Дата"
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleFilterClose} color="primary">
+              Отмена
+            </Button>
+            <Button onClick={handleFilterApply} color="primary">
+              Применить
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+            open={confirmDialogOpen}
+            onClose={handleConfirmDialogClose}
+            aria-labelledby="confirm-dialog-title"
+            aria-describedby="confirm-dialog-description"
+        >
+          <DialogTitle id="confirm-dialog-title">Подтверждение</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="confirm-dialog-description">
+              Вы хотите посетить это мероприятие?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleConfirmDialogClose} color="primary">
+              Нет
+            </Button>
+            <Button onClick={handleEventConfirm} color="primary" autoFocus>
+              Да
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
   );
 }
 

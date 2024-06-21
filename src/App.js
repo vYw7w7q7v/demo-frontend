@@ -10,13 +10,17 @@ import EventSelection from "./pages/event_selection/EventSelection";
 import {AuthProvider} from "./context/AuthContext";
 import AccountSettings from "./pages/account_settings/AccountSettings";
 import {CloseEventProvider} from "./context/event/CloseEventContext";
+import MyEvent from "./pages/my_event/MyEvent";
+import QrCode from "./pages/qr_code_page/QrCode";
+import {ApiProvider} from "./context/api/ApiContext";
 
 const App = () => {
   return (
     <Router>
       <AuthProvider>
-        <CloseEventProvider>
-        <div>
+        <ApiProvider>
+          <CloseEventProvider>
+            <div>
           <Header />
           <Routes>
             <Route path="/" element={<MainPage />} />
@@ -31,14 +35,21 @@ const App = () => {
             <Route path="/selection-event" element={<EventSelection />} />
           </Routes>
           <Routes>
+            <Route path="/my-event" element={<MyEvent />} />
+          </Routes>
+          <Routes>
             <Route path="/account" element={<MyAccount />} />
           </Routes>
           <Routes>
             <Route path="/account-settings" element={<AccountSettings />} />
           </Routes>
+          <Routes>
+            <Route path="/invitation" element={<QrCode />} />
+          </Routes>
           {/*<Footer />*/}
         </div>
         </CloseEventProvider>
+        </ApiProvider>
       </AuthProvider>
     </Router>
   );

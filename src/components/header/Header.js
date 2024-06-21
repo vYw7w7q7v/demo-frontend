@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Link, useLocation} from 'react-router-dom';
 
 // ** Context
 import { useAuthContext } from '../../context/AuthContext';
@@ -25,6 +25,7 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
+import PersonIcon from '@mui/icons-material/Person';
 
 // ** Components
 import AddEventDialog from "../../views/componets/AddEventDialog";
@@ -41,6 +42,19 @@ const Header = () => {
   const [activeButton, setActiveButton] = useState(null);
   const [tabValue, setTabValue] = useState(0);
   const [anchorMenu, setAnchorMenu] = useState(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === '/selection-event') {
+      setActiveButton('view');
+    } else if (location.pathname === '/my-event') {
+      setActiveButton('my-event');
+    } else if (location.pathname === '/info') {
+      setActiveButton('create');
+    } else {
+      setActiveButton(null);
+    }
+  }, [location]);
 
   const handleDialogAddEventOpen = () => {
     setOpenAddEventDialog(true);
@@ -113,6 +127,14 @@ const Header = () => {
           >
             <EventIcon />
             Подборки
+          </Link>
+          <Link
+            to="/my-event"
+            className={`header-button ${activeButton === 'my-event' ? 'active' : ''}`}
+            onClick={() => handleButtonClick('my-event')}
+          >
+            <PersonIcon />
+            Мои события
           </Link>
           <Link
             to="/info"

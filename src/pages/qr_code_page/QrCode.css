@@ -1,0 +1,60 @@
+.main-container-qrcode {
+  display: flex;
+  justify-content: center;
+  height: 83vh;
+  width: 96%;
+  margin: 10px auto;
+  padding: 20px;
+  background-color: white;
+  color: #222;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  background-size: cover;
+  background-position: center;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный белый фон для читаемости текста */
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.settings-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.title {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.description {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.event-details {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.qr-code-container {
+  padding: 10px;
+  background-color: #fff;
+  border: 2px dashed #3f51b5;
+  border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+  .main-container-qrcode {
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px;
+  }
+}
