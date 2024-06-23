@@ -55,21 +55,29 @@ function AddEventDialog({ open, onClose }) {
       const decodedToken = jwtDecode(authToken);
       const organizerId = decodedToken.id;
 
-      await axios.post(`${apiUrl}/open-event/create`, {
+      let url = `${apiUrl}/open-event/create`;
+      if (eventData.closeEvent === 1) {
+        url = `${apiUrl}/close-event/create`;
+      }
+
+      const payload = {
         name: eventData.name_event,
-        description: eventData.description,
+        description: eventData.description || "",
         location: eventData.address,
-        date: eventData.selectedDate,
-        image: eventData.photo,
-        type: 'театр',
+        date: eventData.selectedDate.toLocaleString(),
+        image: eventData.photo || "/img/event/event_2.jpg",
+        type: "театр",
         organizerId: organizerId
-      });
+      };
+
+      await axios.post(url, payload);
       console.log('Данные события успешно отправлены!');
       onClose(false);
     } catch (error) {
       console.error('Ошибка при отправке данных:', error);
     }
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,7 +105,7 @@ function AddEventDialog({ open, onClose }) {
       reader.onloadend = () => {
         setEventData(prevState => ({
           ...prevState,
-          photo: reader.result.split(',')[1] // Base64 string
+          photo: reader.result.split(',')[1]
         }));
       };
       reader.readAsDataURL(file);
@@ -116,7 +124,7 @@ function AddEventDialog({ open, onClose }) {
       reader.onloadend = () => {
         setEventData(prevState => ({
           ...prevState,
-          photo: reader.result.split(',')[1] // Base64 string
+          photo: reader.result.split(',')[1]
         }));
       };
       reader.readAsDataURL(file);

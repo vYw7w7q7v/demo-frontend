@@ -8,7 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 const MyAccount = () => {
   const { authToken } = useAuthContext();
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState({ name: '', id: '', login: '', email: '' });
+  const [userInfo, setUserInfo] = useState({ name: '', id: '', login: '', email: '', avatarUrl: '' }); // Add avatarUrl to userInfo state
 
   useEffect(() => {
     if (!authToken) {
@@ -16,10 +16,10 @@ const MyAccount = () => {
     } else {
       try {
         const decodedToken = jwtDecode(authToken);
-        const { name, id, login, email } = decodedToken;
-        setUserInfo({ name, id, login, email });
+        const { name, id, login, email, avatarUrl } = decodedToken; // Assuming avatarUrl is included in the JWT token
+        setUserInfo({ name, id, login, email, avatarUrl });
       } catch (error) {
-        console.error('Ошибка при декодировании токена:', error);
+        console.error('Error decoding token:', error);
       }
     }
   }, [authToken, navigate]);
@@ -33,7 +33,12 @@ const MyAccount = () => {
         <CardContent>
           <div className="account-info">
             <div className="avatar-container">
-              <Avatar alt="User Avatar" src="/img/avatar/avatar_demo.jpg" className="avatar" sx={{ width: 300, height: 300, borderRadius: 0 }} />
+              <Avatar
+                  alt="User Avatar"
+                  src={userInfo.avatarUrl || ''} // Use avatarUrl from state if available, otherwise fallback
+                  className="avatar"
+                  sx={{ width: 300, height: 300, borderRadius: 0 }}
+              />
             </div>
             <div className="user-details">
               <Typography variant="h4" component="h2">
@@ -41,12 +46,6 @@ const MyAccount = () => {
               </Typography>
               <Typography variant="h6" color="textSecondary">
                 {userInfo.email}
-              </Typography>
-              <Typography variant="body1" color="textSecondary">
-                Есть проблемы — звони,
-                В сердце мрак и огни.
-                Я приду, помогу,
-                Мы разгоним тьму.
               </Typography>
             </div>
           </div>
