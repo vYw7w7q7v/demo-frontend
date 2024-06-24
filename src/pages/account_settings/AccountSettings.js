@@ -31,23 +31,16 @@ const AccountSettings = () => {
   const handleSave = () => {
     const decodedToken = jwtDecode(authToken);
     const userId = decodedToken.id;
-    const login = decodedToken.login;
-    const password = decodedToken.password;
 
-    const data = {
-      id: userId,
-      name: username,
-      login: login,
-      profileImage: null,
-      password: password,
-    };
+    const updateName = axios.put(`${apiUrl}/user/update/name?userId=${userId}&name=${encodeURIComponent(username)}`);
+    const updateAvatar = axios.put(`${apiUrl}/user/update/profileImage?userId=${userId}&profileImage=${encodeURIComponent(avatar)}`);
 
-    axios.put(`${apiUrl}/user/update`, data)
-        .then(response => {
+    Promise.all([updateName, updateAvatar])
+        .then(() => {
           setSuccessMessage("Данные успешно сохранены!");
           setSuccessSnackbarOpen(true);
         })
-        .catch(error => {
+        .catch(() => {
           setErrorMessage("Ошибка при сохранении данных.");
           setErrorSnackbarOpen(true);
         });
@@ -58,6 +51,7 @@ const AccountSettings = () => {
     if (file) {
       if (file.size > 800 * 1024) {
         setErrorMessage("Размер файла превышает 800 КБ.");
+        setErrorSnackbarOpen(true);
         return;
       }
       const reader = new FileReader();
@@ -75,6 +69,7 @@ const AccountSettings = () => {
     if (file) {
       if (file.size > 800 * 1024) {
         setErrorMessage("Размер файла превышает 800 КБ.");
+        setErrorSnackbarOpen(true);
         return;
       }
       const reader = new FileReader();
@@ -140,6 +135,7 @@ const AccountSettings = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   fullWidth
                   margin="normal"
+                  disabled
               />
               <Grid container spacing={2} sx={{ mt: 2 }}>
                 <Grid item>
@@ -148,7 +144,7 @@ const AccountSettings = () => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <Button variant="outlined" color="secondary" onClick={() => {}}>
+                  <Button variant="outlined" color="secondary" onClick={() => { }}>
                     Сбросить
                   </Button>
                 </Grid>

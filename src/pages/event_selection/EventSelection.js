@@ -130,7 +130,6 @@ const EventSelection = () => {
                         onClick={() => handleOpenEventDetails(event)}>
                       Место и время
                     </Typography>
-                    <Button variant="contained" style={{ fontFamily: 'Roboto', marginTop: '10px', backgroundColor: '#FFA500', color: 'white' }} onClick={() => handleConfirmDialogOpen(event)}>Выбрать</Button>
                   </Box>
                 </CardContent>
               </Card>
