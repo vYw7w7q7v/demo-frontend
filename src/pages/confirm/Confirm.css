@@ -1,0 +1,23 @@
+.confirm-container {
+    width: 96%;
+    height: 83vh;
+    margin: 10px auto;
+    padding: 20px;
+    color: #222;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(to bottom right, #f8d7da, #eeb8ba); /* Градиентный фон для недействительного confirm */
+}
+
+.confirm-container.valid {
+    background-color: #d4edda; /* Зеленый цвет фона для действительного confirm */
+    background-image: none; /* Очищаем градиентный фон для действительного confirm */
+}
+
+@media (max-width: 600px) {
+    .confirm-container {
+        width: 90%; /* Уменьшаем ширину контейнера до 90% на устройствах с шириной экрана до 600px */
+        margin: 10px auto;
+        padding: 10px; /* Уменьшаем отступы внутри контейнера */
+    }
+}

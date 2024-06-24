@@ -9,7 +9,7 @@ import axios from 'axios';
 import Typography from "@mui/material/Typography";
 
 const AccountSettings = () => {
-  const { authToken } = useAuthContext();
+  const { authToken, setAuthToken } = useAuthContext();
   const { apiUrl } = useApiContext();
   const [avatar, setAvatar] = useState("");
   const [username, setUsername] = useState("");
@@ -28,22 +28,26 @@ const AccountSettings = () => {
     }
   }, [authToken]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const decodedToken = jwtDecode(authToken);
     const userId = decodedToken.id;
 
-    const updateName = axios.put(`${apiUrl}/user/update/name?userId=${userId}&name=${encodeURIComponent(username)}`);
-    const updateAvatar = axios.put(`${apiUrl}/user/update/profileImage?userId=${userId}&profileImage=${encodeURIComponent(avatar)}`);
+    try {
+      const updateName = axios.put(`${apiUrl}/user/update/name?userId=${userId}&name=${encodeURIComponent(username)}`);
+      const updateAvatar = axios.put(`${apiUrl}/user/update/profileImage?userId=${userId}&profileImage=${encodeURIComponent(avatar)}`);
 
-    Promise.all([updateName, updateAvatar])
-        .then(() => {
-          setSuccessMessage("Данные успешно сохранены!");
-          setSuccessSnackbarOpen(true);
-        })
-        .catch(() => {
-          setErrorMessage("Ошибка при сохранении данных.");
-          setErrorSnackbarOpen(true);
-        });
+      await Promise.all([updateName, updateAvatar]);
+
+      // Assuming the response contains a new token, update the authToken
+      const response = await axios.get(`${apiUrl}/user/token?userid=${userId}`);
+      setAuthToken(response.data.token);
+
+      setSuccessMessage("Данные успешно сохранены!");
+      setSuccessSnackbarOpen(true);
+    } catch (error) {
+      setErrorMessage("Ошибка при сохранении данных.");
+      setErrorSnackbarOpen(true);
+    }
   };
 
   const handleAvatarChange = (e) => {

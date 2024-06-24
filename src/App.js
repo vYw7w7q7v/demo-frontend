@@ -13,6 +13,7 @@ import {CloseEventProvider} from "./context/event/CloseEventContext";
 import MyEvent from "./pages/my_event/MyEvent";
 import QrCode from "./pages/qr_code_page/QrCode";
 import {ApiProvider} from "./context/api/ApiContext";
+import Confirm from "./pages/confirm/Confirm";
 
 const App = () => {
   return (
@@ -30,6 +31,9 @@ const App = () => {
           </Routes>
           <Routes>
             <Route path="/invite" element={<Invitation />} />
+          </Routes>
+          <Routes>
+            <Route path="/confirm-page" element={<Confirm />} />
           </Routes>
           <Routes>
             <Route path="/selection-event" element={<EventSelection />} />

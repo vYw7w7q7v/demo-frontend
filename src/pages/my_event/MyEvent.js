@@ -42,12 +42,14 @@ const MyEvent = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [closedEventsData, setClosedEventsData] = useState([]);
+  const [myEventsData, setMyEventsData] = useState([]);
 
   useEffect(() => {
     if (authToken) {
       const decodedToken = jwtDecode(authToken);
       const organizerId = decodedToken.id;
 
+      // Загрузка закрытых мероприятий
       axios.get(`${apiUrl}/close-event/get-by-organizer-id`, {
         params: {
           organizerId: organizerId
@@ -68,6 +70,33 @@ const MyEvent = () => {
           });
     }
   }, [authToken, apiUrl]);
+
+  useEffect(() => {
+    if (selectedTab === 0 && authToken) {
+      const decodedToken = jwtDecode(authToken);
+      const userId = decodedToken.id;
+
+      // Загрузка моих мероприятий
+      axios.get(`${apiUrl}/open-event/get-created`, {
+        params: {
+          userId: userId
+        },
+      })
+          .then(response => {
+            const eventsWithBase64Images = response.data.map(event => ({
+              ...event,
+              imageUrl: `data:image/jpeg;base64,${event.image}`,
+              datetime: event.date,
+              address: event.location,
+              title: event.name
+            }));
+            setMyEventsData(eventsWithBase64Images);
+          })
+          .catch(error => {
+            console.error('Error fetching my events:', error);
+          });
+    }
+  }, [selectedTab, authToken, apiUrl]);
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -110,11 +139,6 @@ const MyEvent = () => {
     setDeleteDialogOpen(false);
     setSelectedEventId(null);
   };
-
-  const myEventsData = [
-    { id: 1, title: "Мое Событие 1", imageBase64: "<base64 string>", datetime: "2023-06-01 10:00", address: "Адрес 1" },
-    { id: 2, title: "Мое Событие 2", imageBase64: "<base64 string>", datetime: "2023-06-02 11:00", address: "Адрес 2" },
-  ];
 
   const eventsData = selectedTab === 0 ? myEventsData : closedEventsData;
 
