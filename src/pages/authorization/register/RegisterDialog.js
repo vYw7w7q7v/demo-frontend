@@ -17,8 +17,10 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Tooltip from '@mui/material/Tooltip';
 import Alert from '@mui/material/Alert';
+import {useApiContext} from "../../../context/api/ApiContext";
 
 const RegisterDialog = ({ open, onClose }) => {
+  const { apiUrl } = useApiContext();
   const { setAuthToken } = useAuthContext();
   const [formData, setFormData] = useState({
     username: '',
@@ -47,7 +49,7 @@ const RegisterDialog = ({ open, onClose }) => {
       email: formData.email,
     };
 
-    axios.post('http://localhost:8080/auth/sign-up', registrationData)
+    axios.post(`${apiUrl}/auth/sign-up`, registrationData)
         .then(response => {
           setAuthToken(response.data.token);
           setSuccessMessage('Вы успешно зарегистрированы!');

@@ -39,6 +39,7 @@ const MyEvent = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
   const [viewGuestsOpen, setViewGuestsOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [closedEventsData, setClosedEventsData] = useState([]);
 
@@ -94,6 +95,22 @@ const MyEvent = () => {
     setSelectedEventId(null);
   };
 
+  const handleDeleteClick = (event) => {
+    setSelectedEventId(event.id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    // Здесь можно добавить код для удаления мероприятия, используя selectedEventId
+    setDeleteDialogOpen(false);
+    setSelectedEventId(null);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setSelectedEventId(null);
+  };
+
   const myEventsData = [
     { id: 1, title: "Мое Событие 1", imageBase64: "<base64 string>", datetime: "2023-06-01 10:00", address: "Адрес 1" },
     { id: 2, title: "Мое Событие 2", imageBase64: "<base64 string>", datetime: "2023-06-02 11:00", address: "Адрес 2" },
@@ -132,7 +149,7 @@ const MyEvent = () => {
                   <Box className="my-event-image-container" sx={{ marginBottom: '10px' }}>
                     <CardMedia
                         component="img"
-                        src={event.imageUrl} // Now using base64 image
+                        src={event.imageUrl}
                         alt={event.title}
                         className="my-event-image"
                     />
@@ -149,9 +166,9 @@ const MyEvent = () => {
                   <Button
                       variant="contained"
                       style={{ marginTop: '10px', backgroundColor: '#FFA500', color: 'white' }}
-                      onClick={() => handleViewGuestsClick(event, selectedTab === 0)}
+                      onClick={() => selectedTab === 0 ? handleDeleteClick(event) : handleViewGuestsClick(event, true)}
                   >
-                    {selectedTab === 0 ? "Смотреть" : "Выбрать"}
+                    {selectedTab === 1 ? "Смотреть" : "Удалить"}
                   </Button>
                 </Box>
             ))}
@@ -174,6 +191,18 @@ const MyEvent = () => {
             </Dialog>
         )}
         <ViewGuests open={viewGuestsOpen} onClose={handleCloseViewGuests} eventId={selectedEventId} />
+        <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
+          <DialogTitle>Подтверждение удаления</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Вы уверены, что хотите удалить это событие?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancelDelete} color="primary">Отмена</Button>
+            <Button onClick={handleConfirmDelete} color="secondary">Удалить</Button>
+          </DialogActions>
+        </Dialog>
       </Card>
   );
 }
