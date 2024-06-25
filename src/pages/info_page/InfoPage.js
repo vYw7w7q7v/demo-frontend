@@ -49,7 +49,7 @@ const InfoPage = () => {
       <Card className="info-container">
         <CardContent style={{ textAlign: "center" }}>
           <Typography variant="h4">
-            EventEasy - сервис для создания мероприятий
+            EventEase - сервис для создания мероприятий
           </Typography>
           <div style={{ marginTop: "20px" }}>
             <Button variant="contained" color="primary" onClick={handleOpenDialog} style={{ backgroundColor: "#FFA500" }}>
