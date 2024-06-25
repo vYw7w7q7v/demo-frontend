@@ -13,14 +13,16 @@ const Confirm = () => {
 
     const [isValidConfirm, setIsValidConfirm] = useState(null);
     const [confirmationMessage, setConfirmationMessage] = useState('Проверка кода...');
+    const [email, setEmail] = useState('');
 
     useEffect(() => {
         const checkConfirmation = async () => {
             if (confirm) {
                 try {
                     const response = await axios.get(`${apiUrl}/invitation/verify?code=${confirm}`);
-                    if (response.data.valid) {
+                    if (response.data.verified) {
                         setIsValidConfirm(true);
+                        setEmail(response.data.email); // Установка email из ответа
                         setConfirmationMessage(`Подтвержденный код: ${confirm}`);
                     } else {
                         setIsValidConfirm(false);
@@ -37,9 +39,9 @@ const Confirm = () => {
         };
 
         checkConfirmation();
-    }, [confirm, location.search, apiUrl]); // Добавлен location.search и apiUrl в зависимости
+    }, [confirm, location.search, apiUrl]);
 
-    const containerClass = isValidConfirm ? 'confirm-container valid' : 'confirm-container invalid';
+    const containerClass = isValidConfirm === true ? 'confirm-container valid' : 'confirm-container invalid';
 
     return (
         <Card className={containerClass}>
@@ -47,6 +49,11 @@ const Confirm = () => {
                 <Typography variant="h4" align="center" color="textSecondary" fontWeight="bold">
                     {confirmationMessage}
                 </Typography>
+                {isValidConfirm && (
+                    <Typography variant="body1" align="center">
+                        Email: {email}
+                    </Typography>
+                )}
             </CardContent>
         </Card>
     );
