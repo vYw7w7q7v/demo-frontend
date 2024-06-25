@@ -6,7 +6,7 @@ import axios from 'axios';
 import './QrCode.css';
 import { useApiContext } from "../../context/api/ApiContext";
 import { useAuthContext } from "../../context/AuthContext";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const QrCode = () => {
   const { apiUrl } = useApiContext();
@@ -92,14 +92,17 @@ const QrCode = () => {
 
   const handleDialogSend = async () => {
     try {
-      await axios.post(`${apiUrl}/send-invitation`, { email, eventId: selectedEvent });
+      const queryString = `eventId=${selectedEvent}&email=${email}&design=1`;
+      await axios.post(`${apiUrl}/close-event/invite?${queryString}`);
       alert('Приглашение отправлено!');
       setOpenDialog(false);
+      setEmail(''); // Сброс email поля
     } catch (error) {
       console.error('Ошибка при отправке приглашения:', error);
       alert('Не удалось отправить приглашение');
     }
   };
+
 
   const selectedEventData = events.find(event => event.id === selectedEvent) || {};
 
