@@ -22,7 +22,7 @@ const Confirm = () => {
                     const response = await axios.get(`${apiUrl}/invitation/verify?code=${confirm}`);
                     if (response.data.verified) {
                         setIsValidConfirm(true);
-                        setEmail(response.data.email); // Установка email из ответа
+                        setEmail(response.data.email);
                         setConfirmationMessage(`Подтвержденный код: ${confirm}`);
                     } else {
                         setIsValidConfirm(false);
