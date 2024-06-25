@@ -99,6 +99,7 @@ const EventSelection = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{ marginTop: '10px', flex: 1 }}
               />
+
             </Box>
           </CardContent>
         </Card>
