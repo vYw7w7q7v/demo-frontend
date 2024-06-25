@@ -99,9 +99,6 @@ const EventSelection = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{ marginTop: '10px', flex: 1 }}
               />
-              <IconButton onClick={handleFilterOpen} style={{ marginLeft: '10px', marginTop: '10px' }}>
-                <FilterListIcon />
-              </IconButton>
             </Box>
           </CardContent>
         </Card>
